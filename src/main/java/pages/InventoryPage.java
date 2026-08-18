@@ -1,21 +1,18 @@
 package pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import utils.ConfigUtil;
 import utils.LoggerUtil;
 import utils.WaitUtil;
-import utils.ConfigUtil;
-import org.slf4j.Logger;
-import org.openqa.selenium.support.ui.Select;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import java.time.Duration;
 
 public class InventoryPage {
 
@@ -28,7 +25,6 @@ public class InventoryPage {
     private final By inventoryItems = By.className("inventory_item");
     private final By itemPrice = By.className("inventory_item_price");
     private final By itemName = By.className("inventory_item_name");
-    private final By addToCartButton = By.cssSelector("button.btn_inventory");
     private final By cartBadge = By.className("shopping_cart_badge");
     private final By cartLink = By.className("shopping_cart_link");
 
@@ -41,89 +37,76 @@ public class InventoryPage {
     }
 
     public void sortByPriceLowToHigh() {
-        Select select = new Select(driver.findElement(sortDropdown));
-        select.selectByValue("lohi");
+        new Select(driver.findElement(sortDropdown)).selectByValue("lohi");
     }
 
     public static class ProductInfo {
         public String name;
         public double price;
-        public WebElement button;
 
-        public ProductInfo(String name, double price, WebElement button) {
+        public ProductInfo(String name, double price) {
             this.name = name;
             this.price = price;
-            this.button = button;
         }
     }
 
     public List<ProductInfo> addCheapestAndMostExpensiveProducts() {
-        List<WebElement> items = driver.findElements(inventoryItems);
         List<ProductInfo> products = new ArrayList<>();
+        for (WebElement item : driver.findElements(inventoryItems)) {
 
-        for (WebElement item : items) {
             String name = item.findElement(itemName).getText();
 
-            String priceText = item.findElement(itemPrice)
-                    .getText()
-                    .replace("$", "");
-
-            double price = Double.parseDouble(priceText);
-
-            WebElement button = item.findElement(addToCartButton);
-
-            products.add(new ProductInfo(name, price, button));
+            double price = Double.parseDouble(item.findElement(itemPrice)
+                            .getText()
+                            .replace("$", ""));
+            products.add(new ProductInfo(name, price));
         }
 
-        ProductInfo cheapest = products.stream().min(Comparator.comparingDouble(p -> p.price)).orElseThrow();
-        ProductInfo mostExpensive = products.stream().max(Comparator.comparingDouble(p -> p.price)).orElseThrow();
+        ProductInfo cheapest = products.stream()
+                .min(Comparator.comparingDouble(p -> p.price)).orElseThrow();
+
+        ProductInfo mostExpensive = products.stream()
+                .max(Comparator.comparingDouble(p -> p.price)).orElseThrow();
 
         int waitSecs = Integer.parseInt(ConfigUtil.getKey("explicit.wait.seconds"));
         clickAddButtonByProductName(cheapest.name, waitSecs);
+        waitForCartCount(1, waitSecs);
         clickAddButtonByProductName(mostExpensive.name, waitSecs);
+        waitForCartCount(2, waitSecs);
 
-        logger.info("Clicked add-to-cart for: {} (${}) and {} (${})", cheapest.name, cheapest.price, mostExpensive.name, mostExpensive.price);
+        logger.info("Added to cart: {} (${}) and {} (${})", cheapest.name, cheapest.price,
+                mostExpensive.name, mostExpensive.price);
 
-        // Wait for the cart badge to reflect the two added items
-        int expectedCount = 2;
-        try {
-            int waitTime = Integer.parseInt(ConfigUtil.getKey("explicit.wait.seconds"));
-            new WebDriverWait(driver, Duration.ofSeconds(waitTime))
-                    .until(ExpectedConditions.textToBe(cartBadge, String.valueOf(expectedCount)));
-        } catch (Exception e) {
-            logger.warn("Cart badge did not reach expected count {} within timeout", expectedCount);
-        }
-        return List.of(cheapest,mostExpensive);
-
+        return List.of(cheapest, mostExpensive);
     }
 
     private void clickAddButtonByProductName(String productName, int waitSecs) {
-        List<WebElement> items = driver.findElements(By.cssSelector(".inventory_item"));
-        for (WebElement item : items) {
-            try {
-                String name = item.findElement(itemName).getText().trim();
-                if (name.equals(productName)) {
-                    WebElement button = item.findElement(By.cssSelector("button.btn_inventory"));
-                    WaitUtil.clickWhenReady(driver, button, waitSecs);
-                    return;
-                }
-            } catch (NoSuchElementException ignored) {
-            }
-        }
-        throw new org.openqa.selenium.NoSuchElementException("Add button for product '" + productName + "' not found using CSS fallback");
+        String xpath = "//div[contains(@class,'inventory_item')" +
+                " and .//div[contains(@class,'inventory_item_name') and normalize-space()='" +
+                productName + "']]//button";
+        By addButton = By.xpath(xpath);
+        WaitUtil.clickWhenReady(driver, addButton, waitSecs);
+    }
+
+    private void waitForCartCount(int expectedCount, int waitSecs) {
+
+        new WebDriverWait(driver, java.time.Duration.ofSeconds(waitSecs)
+        ).until(driver -> getCartBadgeCount() == expectedCount);
     }
 
     public int getCartBadgeCount() {
-        var badges = driver.findElements(cartBadge);
+
+        List<WebElement> badges = driver.findElements(cartBadge);
+
         if (badges.isEmpty()) {
             return 0;
         }
-        String text = badges.get(0).getText();
-        return Integer.parseInt(text);
+        return Integer.parseInt(badges.get(0).getText());
     }
 
     public void goToCart() {
-        WaitUtil.clickWhenReady(driver, cartLink, Integer.parseInt(ConfigUtil.getKey("explicit.wait.seconds")));
-        WaitUtil.waitForVisibility(driver, By.id("checkout"), Integer.parseInt(ConfigUtil.getKey("explicit.wait.seconds")));
+        int waitSecs = Integer.parseInt(ConfigUtil.getKey("explicit.wait.seconds"));
+        WaitUtil.clickWhenReady(driver, cartLink, waitSecs);
+        WaitUtil.waitForVisibility(driver, By.id("checkout"), waitSecs);
     }
 }

@@ -1,7 +1,6 @@
 package utils;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -20,22 +19,11 @@ public class WaitUtil {
     }
 
     public static void clickWhenReady(WebDriver driver, By locator, int seconds) {
-        WebElement el = new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.presenceOfElementLocated(locator));
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.elementToBeClickable(locator));
-            el = driver.findElement(locator);
-            el.click();
-        } catch (Exception e) {
-            try {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", el);
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
-            } catch (Exception ignored) {
-            }
-        }
+        new WebDriverWait(driver, Duration.ofSeconds(seconds))
+                .until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
     public static void clickWhenReady(WebDriver driver, WebElement element, int seconds) {
-        new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.elementToBeClickable(element));
-        element.click();
+        new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.elementToBeClickable(element)).click();
     }
 }

@@ -39,7 +39,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- ExtentReports (Required for TestListener) -->
+        <!-- ExtentReports -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
@@ -58,12 +58,6 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
             <scope>runtime</scope>
-        </dependency>
-        <!-- WebDriverManager to manage browser drivers automatically -->
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>5.4.1</version>
         </dependency>
     </dependencies>
 

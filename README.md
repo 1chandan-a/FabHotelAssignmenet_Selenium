@@ -1,4 +1,4 @@
-# SauceDemo Automation (FebLabAssignment)
+# SauceDemo Automation (FabHotelAssignment)
 
 ## Overview
 Automation framework to test the end-to-end purchase flow on https://www.saucedemo.com  
@@ -254,45 +254,3 @@ Check disk space availability
 ### Issue: Screenshot not captured
 **Solution:** Verify `test-output/screenshots/` directory permissions
 Check browser driver compatibility
-
----
-
-## Recent Fixes & Updates (v2.0)
-
-✅ **Selenium 4.30.0** - Updated from 4.25.0 for Chrome 151 support  
-✅ **Missing Imports** - Fixed TestListener and RetryAnalyzer imports  
-✅ **Raw Type Warning** - Fixed Class<?> generic type in LoggerUtil  
-✅ **GitHub CI/CD** - Added github_ci.yml workflow  
-✅ **Firefox Only Config** - testng.xml runs Firefox (stable)  
-
----
-
-## Interview-Ready Highlights
-
-### Architecture
-- **POM Design**: Pages separate UI interaction from test logic
-- **DriverManager**: Centralized WebDriver lifecycle management
-- **Configuration Externalization**: Properties-based configuration
-
-### Reliability & Maintenance
-- **Retry Logic**: RetryAnalyzer reduces test flakiness
-- **Failure Reporting**: TestListener captures evidence (screenshots, logs)
-- **Wait Strategies**: Explicit waits with custom conditions
-
-### Quality Verification
-- **Multi-level Assertions**: Page load, cart count, subtotal, PDF content
-- **PDF Validation**: Extracts and verifies PDF text using PDFBox
-- **End-to-End Flow**: Tests complete user journey
-
-### Scalability & Extensibility
-- **Easy to Extend**: Add new page objects and test cases
-- **Parallel Execution**: Configured in pom.xml
-- **CI/CD Ready**: GitHub Actions workflow included
-
----
-
-## Support & Questions
-For issues or questions, check:
-- `test-output/ExtentReport.html` - Visual test execution flow
-- `target/surefire-reports/TEST-*.xml` - Detailed error logs
-- `.github/workflows/github_ci.yml` - Pipeline configuration

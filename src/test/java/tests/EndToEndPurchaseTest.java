@@ -37,7 +37,7 @@ public class EndToEndPurchaseTest extends BaseTest {
         // 5. Verify the cart count
         Assert.assertEquals(inventoryPage.getCartBadgeCount(), 2, "Cart count did not match expected value of 2.");
 
-        // Navigate to Cart
+        // 6. Complete the checkout process (Navigate to Cart)
         inventoryPage.goToCart();
 
         // Navigate to Checkout Information
@@ -48,12 +48,12 @@ public class EndToEndPurchaseTest extends BaseTest {
         CheckoutInformationPage infoPage = new CheckoutInformationPage(driver);
         infoPage.enterInformation("Chandan", "QA", "10001");
 
-        // Checkout Overview Validation
+        // 7. Verify the order summary
         CheckoutOverviewPage overviewPage = new CheckoutOverviewPage(driver);
 
         Assert.assertEquals(overviewPage.getSubtotal(), expectedSubtotal, 0.01, "Overview subtotal does not match sum of selected items.");
 
-        // Step 9: Generate PDF of Order Summary & verify details
+        // 8. Generate a PDF of the order summary and verify the generated PDF details
         String pdfFilePath = PdfUtil.generatePagePdf(driver, "Order_Summary.pdf");
         String pdfContent = PdfUtil.extractPdfText(pdfFilePath);
 

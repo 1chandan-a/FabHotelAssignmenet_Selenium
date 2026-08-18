@@ -66,7 +66,7 @@ FebLabAssignment/
    ↓
 7. Enter shipping information
    ↓
-8. Verify order summary subtotal
+8. Verify order summary
    ↓
 9. Generate PDF order summary
    ↓
@@ -211,9 +211,8 @@ git push -u origin main
 - **PDFBox**: PDF generation for order summaries
 
 ### Browser Support
-- ✅ Firefox (Primary - works perfectly)
-- ✅ Chrome (Non-headless - fully supported)
-- ⚠️ Chrome Headless (CDP version issue - use non-headless)
+- ✅ Firefox
+- ✅ Chrome
 
 ---
 
